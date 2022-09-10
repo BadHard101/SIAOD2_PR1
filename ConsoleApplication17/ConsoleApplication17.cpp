@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <Windows.h>
 #include <bitset>
+#include <fstream>
 using namespace std;
 
 int bit_replace(unsigned char num, unsigned char pos)
@@ -211,5 +212,80 @@ int main2v() //2v
 	for (int i = 0; i < 8; i++)
 		cout << int(randArr[i]) << " ";
 
+	return 0;
+}
+
+int main3a() //3a
+{
+	int n = 0;
+	bitset<999999> arr = 0;
+	bitset<999999> maska = 1;
+
+	unsigned long buff;
+	ifstream fin("random.txt"); // открыли файл для чтения
+	if (fin)
+	{
+		fin >> buff; // считали число
+		while (fin)
+		{
+			//cout << buff << endl; // напечатали число
+			arr = arr | (maska << (999999 - 1 - buff));
+			fin >> buff; // считали следующее число
+		}
+		fin.close(); // закрываем файл
+	}
+	else
+		cout << "ERR, maybe file doesn't exist";
+
+	//cout << arr << endl;
+
+
+	for (unsigned long i = 0; i < 999999; i++)
+	{
+		if (bitset<999999>(arr)[i] == 1)
+		{
+			cout << (999999 - 1 - i) << endl;
+			n++;
+		}
+	}
+	cout << n;
+
+	return 0;
+}
+
+int main() {
+	time_t start;
+	time_t end;
+
+	const int n = 8 * 1024 * 1024; // 1 mb = 8 388 608 bit
+	bitset<n>* arr = new bitset<n>(0);
+	int num;
+
+	ifstream file("random.txt");
+
+
+	while (file.is_open()) {
+		time(&start);
+		while (file >> num) {
+			if (num < n) // (num < 8 388 608)
+				arr->set(num);
+		}
+		time(&end);
+		file.close();
+	}
+	cout << "Sort time: " << end - start << endl;
+
+
+	ofstream nwFile("file.txt");
+	if (nwFile.is_open()) {
+		for (int i = 0; i < n; i++) {
+			if (arr->test(i)) {
+				nwFile << i << " ";
+			}
+		}
+		nwFile.close();
+	}
+	cout << "Array size (bytes): " << arr->size() / 8;
+	cout << "Array size (buts): " << arr->size();
 	return 0;
 }
